@@ -1,0 +1,73 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.nsb.skynet"
+    android:versionCode="6"
+    android:versionName="1.5.1" >
+
+    <uses-sdk
+        android:minSdkVersion="10"
+        android:targetSdkVersion="15" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+        <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-permission android:name="android.permission.READ_SMS"/>
+    <uses-permission android:name="android.permission.SEND_SMS"/>
+    <uses-permission android:name="android.permission.WRITE_CONTACTS"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.WRITE_SMS"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    
+    <!-- Additional required permission for push notification. Apply only for push
+notification ad. -->
+<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+<!-- Required permission for Icon Ad. Apply only for icon ad. -->
+<uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
+    
+
+    <application
+        android:name="GlobalAppActivity"
+        android:icon="@drawable/ic_launcher"
+        android:label="SkyNet">
+        <activity android:name="com.inneractive.api.ads.InneractiveFullScreenView"
+             android:configChanges="orientation" />
+        
+        <!-- Airpush Manifest declaration start SkyNet-->
+<!-- Start required declaration for all ads-->
+<!-- Setup your APPID and APIKEY here. Please append your APIKEY after “airpush<APIKEY>”.
+If you do not have APIKEY you can pass “airpush” as APIKEY. Suppose your APIKEY is
+“1338970568460022873” so you need to pass “airpush1338970568460022873”. -->
+
+<meta-data android:name="com.airpush.android.APPID" android:value="137237" />
+<meta-data android:name="com.airpush.android.APIKEY" android:value="airpush1369411323149427930"/>
+
+<!-- This activity is required for all ads. -->
+<activity android:exported="false" android:name="com.airpush.android.OptinActivity"
+android:configChanges="orientation|keyboardHidden"
+android:theme="@android:style/Theme.Translucent" />
+<!-- End of required declarations for all ads-->
+<!-- Start declaration for push notification ads. -->
+<service android:name="com.airpush.android.PushService" android:exported="false" />
+<receiver android:name="com.airpush.android.BootReceiver" android:exported="false" >
+<intent-filter>
+<action android:name="android.intent.action.BOOT_COMPLETED" />
+<category android:name="android.intent.category.HOME" />
+</intent-filter>
+</receiver>
+<!-- End declaration for push notification ads. -->
+
+        
+        <activity
+            android:name="com.nsb.skynet.MainActivity"
+            android:label="SkyNet" 
+            android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

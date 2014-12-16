@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+
+   <item android:id="@+id/Rate_SkyNet" 
+         android:titleCondensed="Rate it"
+         android:title="Rate SkyNet.."  
+         />
+
+</menu>
