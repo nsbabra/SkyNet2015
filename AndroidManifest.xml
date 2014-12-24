@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.nsb.skynet"
     android:versionCode="6"
-    android:versionName="1.5.1" >
+    android:versionName="1.6" >
 
     <uses-sdk
         android:minSdkVersion="10"
@@ -20,45 +20,39 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     
-    <!-- Additional required permission for push notification. Apply only for push
-notification ad. -->
-<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-<!-- Required permission for Icon Ad. Apply only for icon ad. -->
-<uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
+	<compatible-screens>
+    <!--no small size screens -->
+
+
+    <!--all normal size screens -->
+    <screen android:screenSize="normal" android:screenDensity="ldpi" />
+    <screen android:screenSize="normal" android:screenDensity="mdpi" />
+    <screen android:screenSize="normal" android:screenDensity="hdpi" />
+    <screen android:screenSize="normal" android:screenDensity="xhdpi" />
+
+    <!-- all large size screens -->
+    <screen android:screenSize="large" android:screenDensity="ldpi" />
+    <screen android:screenSize="large" android:screenDensity="mdpi" />
+    <screen android:screenSize="large" android:screenDensity="hdpi" />
+    <screen android:screenSize="large" android:screenDensity="xhdpi" />
+
+    <!-- all xlarge size screens -->
+    <screen android:screenSize="xlarge" android:screenDensity="ldpi" />
+    <screen android:screenSize="xlarge" android:screenDensity="mdpi" />
+    <screen android:screenSize="xlarge" android:screenDensity="hdpi" />
+    <screen android:screenSize="xlarge" android:screenDensity="xhdpi" />
+
+    <!-- Special case for Nexus 7 -->
+    <screen android:screenSize="large" android:screenDensity="213" />
+
+</compatible-screens>
     
 
     <application
         android:name="GlobalAppActivity"
         android:icon="@drawable/ic_launcher"
-        android:label="SkyNet">
-        <activity android:name="com.inneractive.api.ads.InneractiveFullScreenView"
-             android:configChanges="orientation" />
-        
-        <!-- Airpush Manifest declaration start SkyNet-->
-<!-- Start required declaration for all ads-->
-<!-- Setup your APPID and APIKEY here. Please append your APIKEY after “airpush<APIKEY>”.
-If you do not have APIKEY you can pass “airpush” as APIKEY. Suppose your APIKEY is
-“1338970568460022873” so you need to pass “airpush1338970568460022873”. -->
-
-<meta-data android:name="com.airpush.android.APPID" android:value="137237" />
-<meta-data android:name="com.airpush.android.APIKEY" android:value="airpush1369411323149427930"/>
-
-<!-- This activity is required for all ads. -->
-<activity android:exported="false" android:name="com.airpush.android.OptinActivity"
-android:configChanges="orientation|keyboardHidden"
-android:theme="@android:style/Theme.Translucent" />
-<!-- End of required declarations for all ads-->
-<!-- Start declaration for push notification ads. -->
-<service android:name="com.airpush.android.PushService" android:exported="false" />
-<receiver android:name="com.airpush.android.BootReceiver" android:exported="false" >
-<intent-filter>
-<action android:name="android.intent.action.BOOT_COMPLETED" />
-<category android:name="android.intent.category.HOME" />
-</intent-filter>
-</receiver>
-<!-- End declaration for push notification ads. -->
-
-        
+        android:label="SkyNet"
+        android:allowBackup="false">   
         <activity
             android:name="com.nsb.skynet.MainActivity"
             android:label="SkyNet" 

@@ -67,16 +67,16 @@ public class MainActivity extends Activity
 	   EditText et_error;
 	   android.text.ClipboardManager clipboard;
 	   WifiManager wifimanager;
-	   NotificationManager notificationmanager;
+	   NotificationManager notificationmanager; 
 	   Button bt; 
 	   Thread tmain;  
-//	   String devicesip=""; 
+	   String ipAddress=""; 
 	   int notifid; 
 	   boolean isserverup=true;
 	   SkynetServer skn; 
 	   
 	    
-	   String portnumberopened="";
+	   String portnumberopened=""; 
 	   
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -151,7 +151,6 @@ public class MainActivity extends Activity
         }
         catch(Exception ex)
         {
-          //ex.printStackTrace();
         	Log.d("nsb - exception", ex.toString());
         }
     	bt.setEnabled(true);
@@ -165,27 +164,21 @@ public class MainActivity extends Activity
     	ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
     	NetworkInfo wifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
     	
-		String ipAddress = Formatter.formatIpAddress(wifimanager.getConnectionInfo().getIpAddress());
+		ipAddress = Formatter.formatIpAddress(wifimanager.getConnectionInfo().getIpAddress());
     	
     	if ( (wifi.isConnected()) && (!ipAddress.equals("0.0.0.0"))) 
-    	{
-//    		tv_ip.setText("http://"+ipAddress));
-    		
+    	{    		
     		    skn=new SkynetServer();
            	    tmain=new Thread(skn);
                	tmain.start();  
                	bt.setEnabled(false);
                	        	
-               	  Toast.makeText(getApplicationContext(), "Server Up", Toast.LENGTH_LONG).show();
-               	  createNotification(view);
-                   
+               Toast.makeText(getApplicationContext(), "Server Up", Toast.LENGTH_LONG).show();                   
     	}
     	else
         {
-         tv_ip.setText("");
-         Toast.makeText(getBaseContext(), "Connect to a WifiNetwork First", Toast.LENGTH_LONG).show();
+         Toast.makeText(getBaseContext(), "Connect to a Wifi Network First", Toast.LENGTH_LONG).show();
         }
-        tv_ip.append(":"+portnumberopened);       
     }
     
     @Override
@@ -296,7 +289,7 @@ public class MainActivity extends Activity
 	}
     
 
-	public void createNotification(View v)	
+	public void createNotification()	
 	{
 
 		Notification notification =
@@ -307,7 +300,7 @@ public class MainActivity extends Activity
 		Intent intent = new Intent(this,MainActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 		PendingIntent pi=PendingIntent.getActivity(this, 0, intent, 0);	
-		notification.setLatestEventInfo(this, tv_ip.getText()+"", "SkyNet Server is running", pi);
+		notification.setLatestEventInfo(this, tv_ip.getText().toString(), "SkyNet Server is running", pi);
 		notification.flags = Notification.FLAG_NO_CLEAR;		
 		notificationmanager.notify(37, notification);	
 		intent.putExtra("notifid", 37);		
@@ -351,7 +344,8 @@ public class MainActivity extends Activity
     					
     				}
     			}
-    			portnumberopened= Integer.toString(sersock.getLocalPort());
+    			portnumberopened=Integer.toString(sersock.getLocalPort());
+    			mh.sendEmptyMessage(1099);
     			Vibrator v = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);       			 
     			v.vibrate(300);
     			
@@ -712,7 +706,7 @@ public class MainActivity extends Activity
    	      
    	        contact.put(People.Phones.TYPE, People.TYPE_MOBILE);
    	        contact.put(People.NUMBER, contactnumber);
-   	        Uri updateUri = getContentResolver().insert(phoneUri, contact);
+   	        getContentResolver().insert(phoneUri, contact);
         	 
         	 
         	 dos.writeBytes("HTTP/1.1 204 No Content\r\n");
@@ -1401,7 +1395,7 @@ public class MainActivity extends Activity
         		if(resourceurl.endsWith("/"))
         		    resourceurl=resourceurl.substring(0, resourceurl.length()-1);  		   
         		f=new File(resourceurl);
-        		String parentfilepath=f.getParent().replace(" ", "%20");
+//        		String parentfilepath=f.getParent().replace(" ", "%20");
         // ------------------- Folder Logic -----------------------
          
         		
@@ -1411,7 +1405,7 @@ public class MainActivity extends Activity
             String sizecategory="";  //--- For Files
       	   
             DecimalFormat df = new DecimalFormat(".#"); 
-            String tempforfolder = f.getAbsolutePath().replace(" ", "%20");
+//            String tempforfolder = f.getAbsolutePath().replace(" ", "%20");
 
 
             String htmldata = "<table id=\"myFileManager\"><thead><tr><th colspan=\"5\"></th><th></th><th></th></tr></thead><tfoot><tr>" +
@@ -1626,18 +1620,20 @@ public class MainActivity extends Activity
     	   if(resourceurl.endsWith("/"))
     		  resourceurl=resourceurl.substring(0, resourceurl.length()-1);
     	   
-    	   resourceurl = java.net.URLDecoder.decode(resourceurl, "UTF-8");
+    	    resourceurl = java.net.URLDecoder.decode(resourceurl, "UTF-8");
                    	    
           	// f=new File("/mnt/sdcard/webphone/"+resourceurl );
     	    
-          	 f= new File(Environment.getExternalStorageDirectory().toString()+resourceurl);
+          	 f = new File(Environment.getExternalStorageDirectory().toString()+resourceurl);
           	 
           	
           	 
           	 Log.i("nsb","Request for "+resourceurl+" is in : "+f.getPath());
           	  
           	 if(!f.exists()) 
-          	 {        	   
+          	 {        	 
+         		  f=new File(resourceurl); 
+         		 if(!f.exists()){
           		 try
           		 {
           			if(resourceurl.contains("html"))
@@ -1658,20 +1654,16 @@ public class MainActivity extends Activity
                 	 }
                  	 else  
                  	 { 
-                 		 f= new File(resourceurl); 
                  	 }  
                  	 Log.i("nsb - FilePath",f.getAbsolutePath());
           		 }
           		 catch(Exception ex)
           		 {
-          			 String abcdef="Not Found\r\n";
-          			 dos.writeBytes("HTTP/1.1 200 Ok\r\n");
-            		 dos.writeBytes("Content-Type: text/plain\r\n");          
-            		 dos.writeBytes("Content-length: "+abcdef.length() +"\r\n");
+          			 dos.writeBytes("HTTP/1.1 404 Not Found\r\n");
                      dos.writeBytes("Connection: Close\r\n");
                      dos.writeBytes("\r\n");  
-                     dos.writeBytes(abcdef);   
           		 }
+         		 }  
           	 } 
           	 
           	   fis=new FileInputStream(f);
@@ -1684,7 +1676,7 @@ public class MainActivity extends Activity
 //      			{
 //                    if(contenttype.equals(m.res))
 //                    {
-//                  	  mimetype=m.mimetype;
+//                  	  mimetype=m.mimetype; 
 //                  	  break;
 //                    }
 //      			}
@@ -1696,11 +1688,11 @@ public class MainActivity extends Activity
                 dos.writeBytes("\r\n");
                   
                   byte b[] = new byte[1024];    
-                  long count = 0;
+                  long count = 0; 
                   int r;
-                  while(true)
+                  while(true) 
                   {
-                     r = fis.read(b, 0, 1024);
+                     r = fis.read(b, 0, 1024); 
                      if(r==-1)
                      {
                         continue;
@@ -1727,8 +1719,6 @@ public class MainActivity extends Activity
 	   
       catch (IOException e) 
 	  {
-    	  //errorString=e.toString();
-    	  //mh.sendEmptyMessage(1);
 		  e.printStackTrace();
 	  }
       finally
@@ -1762,7 +1752,7 @@ public class MainActivity extends Activity
 
        fileOrDirectory.delete();
     }
-   }
+   } 
 
 
    public class MyHandler extends Handler
@@ -1771,19 +1761,28 @@ public class MainActivity extends Activity
 	 public void handleMessage(Message msg) 
 	 {
 		super.handleMessage(msg);
-		tv_devices.setText("");
-		for(InetAddress inetAddress:GlobalAppActivity.ipsconnected)
-		  tv_devices.append("\n"+inetAddress.getHostAddress());
+		if(msg.what==1099){
+			tv_ip.setText("http://"+ipAddress+":"+portnumberopened);
+			createNotification();
+		}
+		else if(msg.what==99) {
+			tv_devices.setText("");
+			for(InetAddress inetAddress:GlobalAppActivity.ipsconnected)
+			  tv_devices.append("\n"+inetAddress.getHostAddress());
+		}
+		else{
+			Toast.makeText(getBaseContext(), msg.what, Toast.LENGTH_SHORT).show();
+			Log.i("Handler", msg.what+" called");
+		}
 	 }
 }
 
-
-
+ 
 
 }
  
 
-
+   
 
 
 

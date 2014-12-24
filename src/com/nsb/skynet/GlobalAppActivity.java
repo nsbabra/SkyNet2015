@@ -11,3 +11,4 @@ public class GlobalAppActivity extends Application
 	public static boolean canrun=false;
 }
   
+ 
