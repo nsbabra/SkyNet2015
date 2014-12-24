@@ -1,47 +1,44 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/tv_ipaddress"
+     <Button
+        android:id="@+id/bt_server"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="147dp"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="#008FCF" />
-
-
+        android:layout_marginTop="60dp"
+        android:layout_gravity="center_horizontal"
+        android:onClick="go"
+        android:text="Start SkyNet Server" />
+     
     <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/tv_ipaddress"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="32dp"
+	    android:layout_gravity="center_horizontal"
+        android:layout_marginTop="12dp"
         android:text="Type URL on PC Browser :"
         android:textAppearance="?android:attr/textAppearanceMedium" />
-
-    <Button
-        android:id="@+id/bt_server"
-        android:layout_width="177dp"
+    
+    <TextView
+        android:id="@+id/tv_ipaddress"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView1"
-        android:layout_alignParentTop="true"
-        android:layout_alignRight="@+id/textView1"
-        android:layout_marginTop="60dp"
-        android:onClick="go"
-        android:text="Start SkyNet Server" />
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="2dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="#008FCF" />
+
+
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="144dp"
         android:text="Connected Devices"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -49,11 +46,10 @@
         android:id="@+id/tv_connecteddevices"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textView2"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="0dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="2dp"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="#008FCF" />    
 
 
-</RelativeLayout>
+</LinearLayout>

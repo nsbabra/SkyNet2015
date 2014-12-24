@@ -69,7 +69,7 @@ public class MainActivity extends Activity
 	   WifiManager wifimanager;
 	   NotificationManager notificationmanager; 
 	   Button bt; 
-	   Thread tmain;  
+	   Thread tmain;   
 	   String ipAddress=""; 
 	   int notifid; 
 	   boolean isserverup=true;
@@ -1719,7 +1719,7 @@ public class MainActivity extends Activity
 	   
       catch (IOException e) 
 	  {
-		  e.printStackTrace();
+		  e.printStackTrace(); 
 	  }
       finally
       {
@@ -1764,16 +1764,16 @@ public class MainActivity extends Activity
 		if(msg.what==1099){
 			tv_ip.setText("http://"+ipAddress+":"+portnumberopened);
 			createNotification(); 
-		}
+		} 
 		else if(msg.what==99) {
 			tv_devices.setText("");
 			for(InetAddress inetAddress:GlobalAppActivity.ipsconnected)
-			  tv_devices.append("\n"+inetAddress.getHostAddress());
+			  tv_devices.append(inetAddress.getHostAddress()+"\n");
 		}
 		else{
 			Toast.makeText(getBaseContext(), msg.what, Toast.LENGTH_SHORT).show();
 			Log.i("Handler", msg.what+" called");
-		}
+		} 
 	 }
 }
 
