@@ -1,36 +1,50 @@
 package com.nsb.skynet;
 
-import android.media.ThumbnailUtils;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.Uri;
-import android.net.wifi.*;
-import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
-import android.os.Vibrator;
-import android.provider.ContactsContract;
-import android.provider.Contacts.People;
-import android.provider.ContactsContract.PhoneLookup;
-import android.provider.MediaStore;
-import android.provider.MediaStore.Images;
-import android.annotation.SuppressLint;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.text.DecimalFormat;
+import java.util.List;
+import java.util.StringTokenizer;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.AlertDialog.Builder;
-import android.content.*;
+import android.content.ActivityNotFoundException;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.telephony.SmsManager;
-import android.text.Html;
-import android.text.format.DateFormat;
+import android.media.ThumbnailUtils;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
+import android.net.wifi.WifiManager;
+import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Vibrator;
+import android.provider.Contacts.People;
+import android.provider.ContactsContract;
+import android.provider.ContactsContract.PhoneLookup;
+import android.provider.MediaStore;
 import android.text.format.Formatter;
 import android.util.Log;
 import android.view.Menu;
@@ -39,21 +53,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast; 
-
-import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.text.BreakIterator;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import android.widget.Toast;
 
 
 
   
+@SuppressWarnings("deprecation")
 public class MainActivity extends Activity 
 {   
 	   TextView tv_ip,tv_devices; 
@@ -65,7 +70,7 @@ public class MainActivity extends Activity
 	   NotificationManager notificationmanager;
 	   Button bt; 
 	   Thread tmain;  
-	   String devicesip=""; 
+//	   String devicesip=""; 
 	   int notifid; 
 	   boolean isserverup=true;
 	   SkynetServer skn; 
@@ -89,25 +94,17 @@ public class MainActivity extends Activity
 		notificationmanager = (NotificationManager)getSystemService("notification");
         clipboard = (android.text.ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
         wifimanager=(WifiManager) getSystemService(WIFI_SERVICE);
-        //Toast.makeText(getBaseContext(), GlobalAppActivity.canrun+"<- On Create", Toast.LENGTH_SHORT).show();
         
         
         
-        //--------------- Resume wala Logic ---------------------
         
-     	System.gc();
     	GlobalAppActivity.canrun=true;
-    	//Toast.makeText(getBaseContext(), GlobalAppActivity.canrun+"<-- On Resume", Toast.LENGTH_SHORT).show();
     	mh=new MyHandler();
 
         try 
         {
-          InputStream ins=(getBaseContext().getResources().openRawResource(R.raw.webphone));
-           
-          //File folder = new File("mnt/sdcard/");
-           
+          InputStream ins=(getBaseContext().getResources().openRawResource(R.raw.webphone));           
           File folder = Environment.getExternalStorageDirectory();
-          //File folder = new File(device_path);
           folder = new File(folder.toString()+"/webphone");
           Log.d("nsb - folder", folder.toString());
           if(!folder.exists())
@@ -136,7 +133,6 @@ public class MainActivity extends Activity
             {
              FileOutputStream fos = new FileOutputStream(f);
 
-            int len;
             byte b[] = new byte[10000];
             int r;
 
@@ -158,34 +154,37 @@ public class MainActivity extends Activity
           //ex.printStackTrace();
         	Log.d("nsb - exception", ex.toString());
         }
-        
-        
     	bt.setEnabled(true);
         
         //----------------------------------------------------
     }   
     
     public void go(View view)
-    { 	      
-       	tv_ip.setText("http://"+Formatter.formatIpAddress(wifimanager.getConnectionInfo().getIpAddress()));
-
-        if(!(tv_ip.getText().equals("http://0.0.0.0")))
-        { 
-        	skn=new SkynetServer();
-       	    tmain=new Thread(skn);
-           	tmain.start();  
-           	bt.setEnabled(false);
-           	        	
-           	  Toast.makeText(getApplicationContext(), "Server Up", Toast.LENGTH_LONG).show();
-        	  //tv_ip.setVisibility(1);
-           	  createNotification(view);
-        }        
-         else
+    { 	 
+    	//Check if Connected to Wifi
+    	ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+    	NetworkInfo wifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+    	
+		String ipAddress = Formatter.formatIpAddress(wifimanager.getConnectionInfo().getIpAddress());
+    	
+    	if ( (wifi.isConnected()) && (!ipAddress.equals("0.0.0.0"))) 
+    	{
+//    		tv_ip.setText("http://"+ipAddress));
+    		
+    		    skn=new SkynetServer();
+           	    tmain=new Thread(skn);
+               	tmain.start();  
+               	bt.setEnabled(false);
+               	        	
+               	  Toast.makeText(getApplicationContext(), "Server Up", Toast.LENGTH_LONG).show();
+               	  createNotification(view);
+                   
+    	}
+    	else
         {
          tv_ip.setText("");
          Toast.makeText(getBaseContext(), "Connect to a WifiNetwork First", Toast.LENGTH_LONG).show();
         }
-        
         tv_ip.append(":"+portnumberopened);       
     }
     
@@ -346,25 +345,19 @@ public class MainActivity extends Activity
     						}
     						catch(Exception ef)
     						{
-    						   //Toast.makeText(getApplicationContext(), "No free Port found..\n Exiting Now", Toast.LENGTH_LONG).show();
-    						   isserverup=false;
-    						   
+    						   isserverup=false;   						   
     						}
     					}
     					
     				}
     			}
-    			portnumberopened=sersock.getLocalPort()+"";
-    			//Log.d("nsb",portnumberopened+"");
-    			Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);       			 
+    			portnumberopened= Integer.toString(sersock.getLocalPort());
+    			Vibrator v = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);       			 
     			v.vibrate(300);
-    		
+    			
     			Log.d("nsb", "Server Up");
     		
-    	//	if(isserverup)
-    	//	{
-    	    try 
-             {		
+    		
               while(GlobalAppActivity.canrun)
               {                 
          	   try
@@ -372,23 +365,20 @@ public class MainActivity extends Activity
             	sock = sersock.accept();
             	new HTTPHandler(sock);
             	Socket tempsock=sock;
-            	int device_flag=1;
+            	boolean olddevice=false;
             	
-            	for(String s:GlobalAppActivity.ipsconnected)
+            	for(InetAddress s: GlobalAppActivity.ipsconnected)
             	{
-            		if(s.equals(tempsock.getInetAddress()+""))
-            		{  device_flag=0;
+            		if(s.equals(tempsock.getInetAddress()))
+            		{  
+            		   olddevice=true;
             		   break;
             		}
-            		else 
-            			continue;
-            		
             	}
-            	if(device_flag==1)
+            	
+            	if(!olddevice)
             	{
-            		//GlobalAppActivity.ipsconnected.add(tempsock.getInetAddress()+"");
-            		devicesip = tempsock.getInetAddress()+"";
-            		GlobalAppActivity.ipsconnected.add(devicesip);
+            		GlobalAppActivity.ipsconnected.add(tempsock.getInetAddress());
             		mh.sendEmptyMessage(99);            		
             	}
             	
@@ -398,22 +388,8 @@ public class MainActivity extends Activity
          		   Log.d("nsb","breaking loop");
          		   break;
          	   }
-         	   if(i==0)
-                {
-           			v.vibrate(200); 
-                }
-         	   Log.d("nsb", "New Request");
-         	   
-         	   i=1;
              } 
-            }
-    		   catch (Exception e) 
-            {
-     		e.printStackTrace();
-     	   }	
-    	 //}//-- if of server up
-    		 
-        }//-- Run
+        } //-- Run
       }
     
     
@@ -1606,20 +1582,20 @@ public class MainActivity extends Activity
 //                	  break;
 //                  }
 //    			}
-    			
+    			 
     			dos.writeBytes("HTTP/1.1 200 OK\r\n");
     			dos.writeBytes("Content-Type: application/octet-stream\r\n");          
     			dos.writeBytes("Content-length: "+filesize+"\r\n");
                 dos.writeBytes("Connection: Close\r\n");
-                dos.writeBytes("\r\n");
+                dos.writeBytes("\r\n"); 
                 
                 byte b[] = new byte[1024];    
                 long count = 0;
                 int r;
                 while(true)
-                {
+                { 
                    r = fis.read(b,0,1024);
-                   if(r==-1)
+                   if(r==-1) 
                    {
                       continue;
                    }   
@@ -1651,16 +1627,16 @@ public class MainActivity extends Activity
     		  resourceurl=resourceurl.substring(0, resourceurl.length()-1);
     	   
     	   resourceurl = java.net.URLDecoder.decode(resourceurl, "UTF-8");
-                   	   
+                   	    
           	// f=new File("/mnt/sdcard/webphone/"+resourceurl );
-    	   
+    	    
           	 f= new File(Environment.getExternalStorageDirectory().toString()+resourceurl);
           	 
           	
           	 
           	 Log.i("nsb","Request for "+resourceurl+" is in : "+f.getPath());
-          	 
-          	 if(!f.exists())
+          	  
+          	 if(!f.exists()) 
           	 {        	   
           		 try
           		 {
@@ -1675,11 +1651,15 @@ public class MainActivity extends Activity
                  	 else if(resourceurl.contains("css") || resourceurl.contains("js") )
                  	 {
                  		 f=new File(Environment.getExternalStorageDirectory().toString()+"/webphone/"+resourceurl); 
-                 	 } 
-                 	 else 
-                 	 {
-                 		 f= new File(resourceurl);
-                 	 } 
+                 	 }  
+                 	 else if(resourceurl.contains("png") || resourceurl.contains("jpg") ||  resourceurl.contains("gif"))
+                	 {
+                		 f=new File(Environment.getExternalStorageDirectory().toString()+"/webphone/"+resourceurl); 
+                	 }
+                 	 else  
+                 	 { 
+                 		 f= new File(resourceurl); 
+                 	 }  
                  	 Log.i("nsb - FilePath",f.getAbsolutePath());
           		 }
           		 catch(Exception ex)
@@ -1786,13 +1766,14 @@ public class MainActivity extends Activity
 
 
    public class MyHandler extends Handler
-   {
+   {  
 	 @Override
 	 public void handleMessage(Message msg) 
 	 {
 		super.handleMessage(msg);
-		devicesip=devicesip.substring(1);
-		tv_devices.append("\n"+devicesip);
+		tv_devices.setText("");
+		for(InetAddress inetAddress:GlobalAppActivity.ipsconnected)
+		  tv_devices.append("\n"+inetAddress.getHostAddress());
 	 }
 }
 
@@ -1800,12 +1781,12 @@ public class MainActivity extends Activity
 
 
 }
+ 
 
 
 
 
 
-
-
+ 
     
 
