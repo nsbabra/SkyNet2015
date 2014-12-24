@@ -1751,19 +1751,19 @@ public class MainActivity extends Activity
              DeleteRecursive(child);
 
        fileOrDirectory.delete();
-    }
+    } 
    } 
-
+ 
 
    public class MyHandler extends Handler
-   {  
+   {   
 	 @Override
 	 public void handleMessage(Message msg) 
 	 {
 		super.handleMessage(msg);
 		if(msg.what==1099){
 			tv_ip.setText("http://"+ipAddress+":"+portnumberopened);
-			createNotification();
+			createNotification(); 
 		}
 		else if(msg.what==99) {
 			tv_devices.setText("");
